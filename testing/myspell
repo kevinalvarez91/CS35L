@@ -1,0 +1,19 @@
+#!/bin/sh
+# Process input, transform it, and sort it
+#INPUT=$(tr -cs 'A-Za-z' '[\n*]' | sort -u)
+#echo "$INPUT" > sorted_words.txt
+#comm -23 sorted_words.txt sorted.words
+
+#rm sorted_words.txt
+
+#comm -23 output.txt sorted.txt
+
+input_sorted=$(mktemp)
+words_sorted=$(mktemp)
+
+tr -cs 'A-Za-z' '[\n*]' | sort -u > "$input_sorted"
+tr -cs 'A-Za-z'	'[\n*]' < sorted.words | sort -u > "$words_sorted"
+
+comm -23 "$input_sorted" "$words_sorted"
+
+rm "$input_sorted" "$words_sorted"

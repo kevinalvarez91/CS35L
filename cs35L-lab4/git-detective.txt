@@ -1,0 +1,156 @@
+
+	Step 1:
+	     The first thing I did, was git grep "segfault", while this worked correctly, the range of the changes was too wide. I was
+	     getting results that contain too many results to filter through..
+	Step 2:
+	     The next step I did was I attempted the following command, which was to give me a more simplified version of what I needed.
+	     -> git log --grep="segfault" -i -- since="2022-06-01" --until="2022-12-12" --oneline
+	     -> This gave me a much more refinded search where I could check, each of the individual commits. There were 2 that stood out
+	     to me, that contained read-only-repo, just like the question contained.
+	     	-> bcf22f29df Merge branch 'js/merge-ort-in-read-only-repo' into maint-2.38
+		-> 19118cb857 Merge branch 'js/merge-ort-in-read-only-repo'
+		The first one, is intresting, but what it is saying is that it is merging the branch into the maint branch,
+		which we know from a previous question is a local branch, that is speciically used for maintence. This leaves us
+		with the 2nd option with doesn't specify which branch is is being merged into, which means it defaults to main/master.
+		Which is what we want.
+	Step 3:
+	     I then ran git show 19118cb857, to view the contents of the commit, to verify if this is the commit that we want.
+	     After running I got the following output,
+	     	   commit 19118cb8570e499e1a56e81740cee3d1c1206b44
+		   Merge: a215853545 92481d1b26
+		   Author: Junio C Hamano <gitster@pobox.com>
+		   Date:   Mon Oct 10 10:08:43 2022 -0700
+
+		       Merge branch 'js/merge-ort-in-read-only-repo'
+
+		           In read-only repositories, "git merge-tree" tried to come up with a
+			   merge result tree object, which it failed (which is not wrong) and
+			   led to a segfault (which is bad), which has been corrected.
+
+			       * js/merge-ort-in-read-only-repo:
+				 merge-ort: return early when failing to write a blob
+				 merge-ort: fix segmentation fault in read-only repositories
+
+	Step 4:
+	     This is exactly what we want! The author of the change was Junio C Hamano, Date: Mon Oct 10. The code changes are
+	     merge-ort: return early when failing to write a blob
+	     merge-ort: fix segmentation fault in read-only repositories.
+	     The patch notes say that the Codpath that reads from the index v4 had unalighed memory accesses, which has been corrected.
+	     Also there was other code cleanup, docfix, build fix, etc. Such as DEF_VER=v2.38.0, compared to new DEF_VAR=v2.38.GIT. 
+	     	     diff --git a/merge-ort.c b/merge-ort.c
+		     index f3bdce1041..e5f41cce48 100644
+		     --- a/merge-ort.c
+		     +++ b/merge-ort.c
+		     @@ -2807,6 +2807,8 @@ static int process_renames(struct merge_options *opt,
+                                                           pathnames,
+                                                           1 + 2 * opt->priv->call_depth,
+                                                           &merged);
+							   +                       if (clean_merge < 0)
+							   +                               return -1;
+							                           if (!clean_merge &&
+					                            merged.mode == side1->stages[1].mode &&
+					                            oideq(&merged.oid, &side1->stages[1].oid))
+								    @@ -2916,7 +2918,7 @@ static int process_renames(struct merge_options *opt,
+                        					    struct version_info merged;
+
+					                        struct conflict_info *base, *side1, *side2;
+								-                       unsigned clean;
+								+                       int clean;
+
+                        					pathnames[0] = oldpath;
+                        					pathnames[other_source_index] = oldpath;
+						      		@@ -2937,6 +2939,8 @@ static int process_renames(struct merge_options *opt,
+                                                     		pathnames,
+                                                     		1 + 2 * opt->priv->call_depth,
+                                                     		&merged);
+								+                       if (clean < 0)
+								+                               return -1;
+
+                        					memcpy(&newinfo->stages[target_index], &merged,
+                               					sizeof(merged));
+								@@ -3806,10 +3810,10 @@ static int write_completed_directory(struct merge_options *opt,
+								 }
+
+								  /* Per entry merge function */
+								  -static void process_entry(struct merge_options *opt,
+								  -                         const char *path,
+								  -                         struct conflict_info *ci,
+								  -                         struct directory_versions *dir_metadata)
+								  +static int process_entry(struct merge_options *opt,
+								  +                        const char *path,
+								  +                        struct conflict_info *ci,
+								  +                        struct directory_versions *dir_metadata)
+								   {
+								           int df_file_index = 0;
+
+									   @@ -3823,7 +3827,7 @@ static void process_entry(struct merge_options *opt,
+									                   record_entry_for_tree(dir_metadata, path, &ci->merged);
+											                   if (ci->filemask == 0)
+									                        /* nothing else to handle */
+												-                       return;
+												+                       return 0;
+												                assert(ci->df_conflict);
+														        }
+
+										@@ -3870,7 +3874,7 @@ static void process_entry(struct merge_options *opt,
+										                 */
+										                if (ci->filemask == 1) {
+										                        ci->filemask = 0;
+													-                       return;
+													+                       return 0;
+													                }
+
+															                /*
+									@@ -4065,7 +4069,7 @@ static void process_entry(struct merge_options *opt,
+									        } else if (ci->filemask >= 6) {
+										                /* Need a two-way or three-way content merge */
+												                struct version_info merged_file;
+														-               unsigned clean_merge;
+														+               int clean_merge;
+														                struct version_info *o = &ci->stages[0];
+														                struct version_info *a = &ci->stages[1];
+														                struct version_info *b = &ci->stages[2];
+									@@ -4074,6 +4078,8 @@ static void process_entry(struct merge_options *opt,
+						                                                   ci->pathnames,
+						                                                   opt->priv->call_depth * 2,
+                                                   						   &merged_file);
+												   +               if (clean_merge < 0)
+												   +                       return -1;
+                										   ci->merged.clean = clean_merge &&
+								                                   !ci->df_conflict && !ci->path_conflict;
+											                ci->merged.result.mode = merged_file.mode;
+										@@ -4169,6 +4175,7 @@ static void process_entry(struct merge_options *opt,
+										
+										        /* Record metadata for ci->merged in dir_metadata */
+											        record_entry_for_tree(dir_metadata, path, &ci->merged);
+												+       return 0;
+												 }
+
+												  static void prefetch_for_content_merges(struct merge_options *opt,
+												  @@ -4285,7 +4292,10 @@ static int process_entries(struct merge_options *opt,
+										                        record_entry_for_tree(&dir_metadata, path, mi);
+													                else {
+										                        struct conflict_info *ci = (struct conflict_info *)mi;
+										-                       process_entry(opt, path, ci, &dir_metadata);
+										+                       if (process_entry(opt, path, ci, &dir_metadata) < 0) {
+										+                               ret = -1;
+										+                               goto cleanup;
+										+                       };
+                											}
+			        									}			
+										        trace2_region_leave("merge", "processing", opt->repo);
+
+	Step 5: Everything above is part of the diff file, where I do git show 92481d1b26, this is one of the parents of the 19118cb857 commit. As we
+	know, the first merge ID is the main/master branch by default for git. This is also one of the parents of the commit we are intrested in aka, 19118cb857.
+	While the second merge ID is the branch you are usually merging into main. You can also have more than 2 merge ID's however, the premises is the same.
+	For example, if you have a 3-way merge, that means your firsr merge ID is the main, the 2nd ID is one of the branchs you are merging into main, and the
+	3rd ID is one of the branches that you are merging into main as well.
+	Noting this:
+	       Summary:
+			Commit ID(Hash): 19118cb857 -> This is the commit ID (records the state of the repo after merging the two branchs below)
+			Main Parent ID(Hash): a215853545 -> This is the main branch
+			Parent ID(Hash), (Branch): 92481d1b26 -> This is the branch that is getting merged into main
+			
+	       
+
+

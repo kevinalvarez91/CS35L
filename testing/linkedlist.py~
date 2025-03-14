@@ -1,0 +1,19 @@
+# Defining a node in a linked list
+
+class Node:
+    def __init__(self, value):
+        self.value = value
+        self.next = None
+
+if __name__ == '__main__':
+    # Building a linked list
+    root = Node(0)
+    curr = root
+    for num in range(1, 10):
+        curr.next = Node(num)
+        curr = curr.next
+
+    curr = root
+    while curr is not None:
+        print(curr.value)
+        curr = curr.next

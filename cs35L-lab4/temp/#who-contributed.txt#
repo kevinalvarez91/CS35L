@@ -1,0 +1,31 @@
+	Step 1:
+	    The first command that I ran was ls -la, this gave me all the files and directories(hidden to). From this I understood,
+	    there is simply too many files to go through, and cat | grep "Even newspaper...". I looked at the grep man page to see
+	    if there was a solution to this (as this should be a common problem), and I found the -r option, which allows you to
+	    recursively search through files and directorys. So I ran the following command
+	    		-> ls -la | grep -r "Even newspaper reports present contraditory information."
+			   -> Output: ./northamerica:# and wrote "Even newspaper reports present contradictory information."
+			This means that the source file that was changed was ./northamerica...
+	Step 2:
+	     I navigated into the file, using emacs northamerica. From there I did C-s (incremental search), and typed in
+	     "Even newspaper reports present contraditory information.". This is located on line number 883.
+	Step 3:
+	     Next I tried git log --reverse northamerica, in the hopes that I would see the introduction of "Even ...", in
+	     the first couple of commits. Unfortuantly I was incorrect.
+	Step 4:
+	     I then tried git log -S "Even newspaper reports present contradictory information". northamerica
+	       -> This only presented one single outcome, making the filtering much easier.
+	Step 5:
+	     This string was introduced in the commit pushed by Arthur David Olson, on the 21st of Dec 1995.
+	     The commit message was Eggert changes, which leads me to believe Prof Eggert, has made some changes,
+	     but it was push to the repo by Arthur.
+	     
+
+	     commit c12b432741eed9a422fbf99fa27af6e7a941d88b
+	     Author: Arthur David Olson <ado@elsie>
+	     Date:   Thu Dec 21 11:43:42 1995 -0500
+
+	         Eggert changes
+
+		     SCCS-file: northamerica
+		     SCCS-SID: 7.20

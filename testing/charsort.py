@@ -1,0 +1,27 @@
+#!/opt/homebrew/bin/python3
+
+import sys
+import argparse
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("file")
+    
+    #this is basically saying ignore sys.argv[0]
+    args = parser.parse_args(sys.argv[1:])
+
+    with open(args.file) as f:
+        for line in f:
+            sorted_chars = ''.join(sorted(line.strip()))
+            print(sorted_chars)
+
+def main():
+    with open(sys.argv[1], 'r') as file:
+        for line in file:
+            print("".join(sorted(line.strip()])))
+
+
+
+            
+if __name__ == "__main__":
+    main()

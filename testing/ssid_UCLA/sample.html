@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Student Login</title>
+</head>
+<body>
+  <h1>Login</h1>
+  <form id="loginForm">
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" required>
+    <br/>
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required>
+    <br/>
+    <button type="submit">Login</button>
+  </form>
+
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Here you would normally verify the user's credentials.
+      // For this example, we assume credentials are valid and then test SIS connectivity.
+      const url = 'https://api.ucla.edu/sis/infrastructure/verifyconnectivity/v1?anyText=verify';
+
+      fetch(url)
+        .then(response => {
+          if (response.status === 200) {
+            // Connectivity to SIS is confirmed
+            alert('SIS connectivity verified. Proceeding with student verification...');
+            // Additional logic goes here. For example, call another endpoint that checks if the user is a student.
+          } else {
+            // Handle errors such as 400, 401, etc.
+            alert('Error connecting to SIS. Status: ' + response.status);
+          }
+        })
+        .catch(error => {
+          console.error('Error connecting to SIS:', error);
+          alert('Failed to connect to SIS.');
+        });
+    });
+  </script>
+</body>
+</html>

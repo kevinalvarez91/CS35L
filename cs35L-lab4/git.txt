@@ -1,0 +1,11 @@
+
+	The main difference that I can tell, just like the instructions says is when I run git branch on both. On the one
+	located on the seasnet server 2 different branches come up. maint and master. Master of course is as expected,
+	since that is the defualt "main" branch. But the maint branch is a local branch. As we know git branch simiply,
+	will list all of the branches that exist in the repo. After some research, the maint branch is used for maintenance
+	releases. i.e it contains bug fixes that can be applied to previous stable versions of git, that don't introduce any
+	new features. I attempted to switch into the maint branch, via git checkout maint, but got a permission denied error.
+	Comparing this to the git branch I cloned from github, no such maint branch exists. This is because the maint branch
+	is a local branch (aka you must create it via git branch maint), and local branchs can't be cloned from a repo on github,
+	because when you push a change, your pushing the change to the main branch not the local branch(since the local branch already
+	has that change). 

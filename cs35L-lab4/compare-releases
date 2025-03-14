@@ -1,0 +1,3 @@
+#!/bin/sh
+
+git diff 2023d 2024a

@@ -1,0 +1,12 @@
+#!/bin/sh
+#SORTED_REF="sorted.words"
+#sort - | comm -23 - "$SORTED_REF"
+
+INPUT=$(tr -cs 'A-Za-z' '[\n*]' | sort -u)
+(tr -cs 'A-Za-z' '[\n*]' < sorted.words | sort -u) > words_sorted
+echo "$INPUT" > sorted_words
+
+comm -23 sorted_words words_sorted
+rm sorted_words words_sorted
+
+

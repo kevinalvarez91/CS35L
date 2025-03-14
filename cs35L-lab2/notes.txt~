@@ -1,0 +1,100 @@
+Exercise 2.1: Navigating through Emacs source code
+     1. compute (2^(607 - 1)) * (2^607 - 1)
+     	-> (* (expt 2 (- 607 1)) (- (expt 2 607) 1))
+	141053783706712069063207958086063189881486743514715667838838675999954867742652380114104193329037690251561950568709829327164087724366370087116731268159313652487450652439805877296207\
+	297446723295166658228846926807786652870188920867879451478364569313922060370695064736073572378695176473055266826253284886383715072974324463835300053138429460296575143368065570759537\
+	328128
+     2. compute total number of bits
+     	-> (logb (* (expt 2 (- 607 1)) (- (expt 2 607) 1)))
+	   -> 1212
+     3. Type C-h k C-h k
+     	-> It's the same as the lists of all the keybinds, the only difference is that C-h k C-h k,
+	at the top of the buffer says "C-h k runs the command describe-key (found in global map)",
+	while when you go through the list it omits this, and says instead "describe-key is an
+	interactive byte-compiled Lisp function in" (on the top line). 
+     4. Type C-h k M-SPC
+     	-> It's the same as the list of all the keybinds, the only difference is similar to above, that
+	in the top of the buffer for C-h k M-SPC it says "M-SPC runs the command cycle-spacing (found in
+	global-map), which is an interactive byte-compiled Lisp function in ", while when navigating to there
+	via the list of all key-binds it says "cycle-spacing is an interactive byte-compiled Lisp function in"
+     5. Describe how you execute the general M-SPC function.
+     	-> There are two seperate ways you can execute M-SPC, the first is literally doign M-SPC. Hitting the
+	Meta key while holding down the space bar will work. "put exactly one space at point". 
+Exercise 2.2: Scripting Emacs
+     No questions
+
+Homework: Python scripting
+     1. What happens when this script(randline.py), is invoked with Python 3 rather than Python 2, and why?
+     	-> It throws an SyntaxError, because of invalid syntax. This is because the way that error exceptions
+	are handled in python2 vs python3 are different, which means that invoking it via python3 will throw an error.
+	Python3 now requires you to use the "as" keyword to bind an exception object to the variable, which is not
+	implemented in this case.
+     2. What happens when your shuf.py script is invoked with Python 2 rather than Python 3, and why?
+     	-> Nothing happens, it runs as expected. This was stange behavior because I was under the assumption
+	that argparse was a python3 module. However after looking into it, argparse was introduced in python 2.7,
+	and conicidentally after running python2 --version of seas.net srv15 it reports 2.7.18. Which makes sense
+	as to why, it runs with no issues.
+     3. The Python 3.11 release notes say that Python 3.11 is significantly faster than older releases. Can you measure the performance difference?
+     	-> Note: seas.net srv15 reports 3.13.1, after running python --version/python3 --version.
+	   -> /usr/local/python --version reports 3.9.21 (pre 3.11)
+	-> Benchmarks ran on Linux Seasnet Server 15
+	   -> Specs
+	      -> x86_64
+	      -> 32-bit, 64-bit
+	      -> Little Endian(byte order)
+	      -> CPU(s): 4
+	      -> GenuineIntel
+	      -> Intel(R) Xeon(R) Silver 4116 CPU @ 2.10 GHz
+	      -> "Red Hat Enterprise Linux"
+	      -> "Version_Id = 9.5 (Plow)"
+	      -> "PRETTY_NAME = "Red Hat Enterprise Linux 9.5 (Plow)"
+
+       -> Benckmarks
+       	  -> SHUF1:
+		real	0m0.077s
+		user	0m0.062s
+		sys	0m0.013s
+
+	  -> SHUF2:
+		real	0m0.069s
+	     	user	0m0.055s
+	     	sys	0m0.012s
+
+	  -> SHUF3:
+		real	0m0.067s
+	     	user	0m0.056s
+	     	sys	0m0.010s
+		Median  0m0.067
+	  -> PYTHON2_1:
+		real	0m0.064s
+		user	0m0.021s
+		sys	0m0.011s
+	  -> PYTHON2_2:
+		real	0m0.059s
+	     	user	0m0.019s
+	     	sys	0m0.013s
+	  -> PYTHON2_3:
+		real	0m0.073s
+	     	user	0m0.022s
+	     	sys	0m0.019s
+		Median  0m0.032s
+	  -> PYTHON3_1:
+		real	0m0.081s
+		user	0m0.036s
+		sys	0m0.011s
+	  -> PYTHON3_2:
+	     	real	0m0.061s
+		user	0m0.041s
+		sys	0m0.004s
+	  -> PYTHON3_3:
+		real	0m0.070s
+		user	0m0.031s
+		sys	0m0.016s
+	  	Median  0m0.047s
+	  
+	  
+	     
+	 
+     
+     
+	

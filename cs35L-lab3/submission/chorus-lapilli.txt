@@ -1,0 +1,84 @@
+Tutorial
+	1. Time to create a React project, there is a old/depreacted way to create a react project that involves doing
+	something like create-react... This is no longer the correct way to do it. Instead do the following command:
+		  e.g npm create vite@latest chorus-lapilli --template react
+		  cd chorus-lapilli
+		  npm install
+		  npm run dev
+	2. The following above will start up a localhost, in which you should see the standard react / vite template.
+	3. From here open  your chorus-lapilli with your ide of your choosing.
+	4. Assuming you have already created the tic-tac-toe beginner react project from before, lets start from there
+	5. Copy the code in App.js from the tic-tac-toe project into App.jsx in chorus-lapilli.(Delete the old code).
+	6. Continuing the above replace everything index.css with everything that was in the old css document in tic-tac-toe.
+	7. Also replace everything that is in main.jsx, with everything that was in main.js in the tic-tac-toe project.
+	8. Perfect you should now see the exact same tic-tac-toe project, that you had before but running on your new
+	react project called chorus-lapilli.
+	9. Lets rewind a little bit, currently the tic-tac-toe project has a lot of features that you don't need. We need
+	to remove all of the "history" buttons that were implemented towards the end of the project. The easiest way to do
+	this is to navigate to the React Tutorial, and copy and paste the code before the history buttons were implmented.
+	If you wish to do it the difficult way, then simply try to reverse engineer and remove the history buttons yourself.
+	10. The first thing to implement is to ensure that the game stops at 3 'X's and 3 'O's. To do this we need to be able
+	to count the amount of X's and O's currently on the board. This can be implemented with a state, however I don't think
+	its necessary and we are simply implementing a counter. Therefore lets define a const(you may define this in the
+	board componennt):
+	    	      const Xcount = squares.filter((square) => square === 'X').lenghth;
+		      const Ocount = squares.filter((square) =>  square === 'O').length;
+
+	11. This is counting the number of X's and O's on the board. This is important as now we can implement the following
+	which is self explanatory.
+	      	      if (Xcount === 3 && Ocount === 3)
+	12. The first condition to check is if both players have placed all their pieces
+	13. Next, we introduce a new mechanic: if the current player owns the center square (index 4), they are restricted in
+	their movement. The game first checks if moving any of their pieces will immediately result in a win. This is done using:
+	      		function isWinningMove(from, to) {
+ 				  const tempSquares = squares.slice();
+				    tempSquares[to] = tempSquares[from]; // Simulate move
+				      tempSquares[from] = null;
+				        return calculateWinner(tempSquares) === currentPlayer;
+					}
+	14. The next step is to determine whether the player must move the center piece. If no immediate winning move is
+	available, then the player must move the center piece (if they own it). The game enforces this rule by checking:
+		   	if (squares[4] === currentPlayer)
+
+	15. The game then forces the player to select only the center piece by setting:
+	    if (i !== 4) {
+  	       console.log(`Player ${currentPlayer} must move the center piece.`);
+  	       	return;
+			}
+
+	16. Once the center piece is selected, the player can only move it to adjacent squares. The game enforces this
+	by checking:
+		const adjacent = adjacentSquares(userSquare);
+		if (squares[i] === null && adjacent.includes(i))
+	17. Now that movement is enforced, we need to handle general movement of pieces. When a player selects a
+	piece (instead of placing it), the game keeps track using:
+	      setuserSquare(i);
+
+	18. Finally, the handleClick function ensures that once a piece is moved, the game updates the board state using:
+	    nextSquares[i] = squares[userSquare]; // Move the piece
+	    nextSquares[userSquare] = null;       // Clear old position
+	    setuserSquare(null);                  // Reset selection
+	    onPlay(nextSquares);
+
+	19. Finally, you seem to be done.. While I have left out a lot of the nitty grity details, this is done intentionally,
+	with the intention of forcing you to have to struggle through a bit. That being said, I will give you this(as it
+	can be tricky)
+	    function adjacentSquares(square) {
+ 	    	      const possabilities = [
+		      	        [1, 3, 4],                  //square 0
+				[0, 2, 3, 4, 5],            //square 1
+				[1, 4, 5],                  //square 2
+				[0, 1, 4, 6, 7],            //square 3
+				[0, 1, 2, 3, 5, 6, 7, 8],   //square 4
+				[1, 2, 4, 7, 8],            //square 5
+				[3, 4, 7],                  //square 6
+				[3, 4, 5, 6, 8],            //square 7
+				[4, 5, 7]                   //square 8
+				]
+				  return possabilities[square];
+				  	 }
+	20. What this will allow you to is check the possible adjacent Squares, instead of having to do heavy mathmatical
+	calculations you can do this. Simply check against the index, and its a possability. Like as stated on step 16.
+	21. Also don't mind the calculateWinner, this is more of a mathmatical function compared to understanding how
+	react will work or not. Also I recommend to split your components as possible, as my Board component is currently
+	extrememly long, and this make debugging rather difficult. 

@@ -1,0 +1,11 @@
+#!/bin/sh
+
+cd ~
+mkdir -p backup
+
+for i in $(ls -a); do
+if [["$i" != "backup" ]]; then
+    cp -r "$i" backup
+    fi
+done
+

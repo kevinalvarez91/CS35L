@@ -1,0 +1,47 @@
+#!/usr/bin/python
+import argparse
+import random
+import sys  # Import sys for sys.exit()
+
+def main():
+    # Argument Parser Setup
+    parser = argparse.ArgumentParser(description="This program is for random checker")
+    parser.add_argument("-r", "--range", type=str, required=True, help="Giving range of possible combinations (e.g., 1-100)")
+    parser.add_argument("-t", "--tries", type=int, required=True, help="Giving the number of tries for the user")
+
+    args = parser.parse_args()
+
+    # Ensure `args.range` is in correct format
+    try:
+        start, end = map(int, args.range.split('-'))
+    except ValueError:
+        print("Error: Range must be in 'start-end' format (e.g., 1-100).")
+        sys.exit(1)
+
+    # Generate a random number within the given range
+    number = random.randint(start, end)
+    counter = 0  # Counter for user attempts
+
+    print("🎲 Random Number Generator Checker 🎲")
+
+    while counter < args.tries:
+        try:
+            usrNum = int(input(f"Attempt {counter+1}/{args.tries}: Enter a number between {start}-{end}: "))
+        except ValueError:
+            print("Invalid input! Please enter a valid number.")
+            continue  # Skip this iteration and retry
+
+        if usrNum == number:
+            print("🎉 You got it! 🎉")
+            sys.exit(0)  # Exit successfully
+        else:
+            print("❌ Incorrect! Try again.")
+
+        counter += 1  # Increment attempts
+
+    # If user runs out of tries
+    print(f"😢 You ran out of tries! The correct number was {number}.")
+    sys.exit(0)
+
+if __name__ == "__main__":
+    main()

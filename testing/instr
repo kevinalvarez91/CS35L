@@ -1,0 +1,16 @@
+R: 4 5
+I: 4 5'
+LW: 4' 5'
+SW: 4' 5 6'
+BEQ: 5 6
+
+lui rd, imm 
+Control path table for LUI:
+RegWrite=1
+AluSrc=1
+Branch=0
+Memread=0
+MemWrite=0
+MemtoReg=0
+
+
